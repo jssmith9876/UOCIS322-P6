@@ -56,22 +56,35 @@ def page_not_found(error):
 
 # api.add_resource(test, '/test')
 
-class listAll(Resource):
-    def get(self):
-        # Get the times from the db
-        data = acp_db.get_times()
+def get_API_results(desired_keys, return_type='json'):
+    # Get the times from the db
+    data = acp_db.get_times()
 
-        # Fill the result with only opening and closing times
-        time_keys = ['open', 'close']
-        times = {}
-        for entry in data:
-            ind = int(entry['index'])
-            times[ind] = {key: entry[key] for key in time_keys}
+    # Fill the result with only opening and closing times
+    times = {}
+    for entry in data:
+        ind = int(entry['index'])
+        times[ind] = {key: entry[key] for key in desired_keys}
 
-        # Return the json
+    # Return the json
+    if (return_type == 'json'):
         return flask.jsonify(times)
 
+class listAll(Resource):
+    def get(self):
+        return get_API_results(['open', 'close'])
+
+class listOpenOnly(Resource):
+    def get(self):
+        return get_API_results(['open'])
+
+class listCloseOnly(Resource):
+    def get(self):
+        return get_API_results(['close'])
+
 api.add_resource(listAll, '/listAll')
+api.add_resource(listOpenOnly, '/listOpenOnly')
+api.add_resource(listCloseOnly, '/listCloseOnly')
 
 ###############
 #
