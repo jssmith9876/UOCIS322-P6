@@ -331,7 +331,8 @@
                   if ($(".warnings").text().length > 0) {
                      $(".submit-result").text("Submission failure: Warnings must be addressed before submission");
                   } else {
-                     $.post(SUBMIT_URL, {entries: entries}, function(response) {
+                     $.post(SUBMIT_URL, {entries: JSON.stringify(entries)}, function(response) {
+                        console.log(response)
                         if (response.response.delivered) {
                            $(".submit-result").text("Control times have been successfully submitted!");
                         }
