@@ -9,27 +9,18 @@ from flask import request
 import arrow  # Replacement for datetime, based on moment.js
 import acp_times  # Brevet time calculations
 import acp_db     # Database interactions
-import config
-from flask_restful import Resource, Api
 import json
-from bson.json_util import dumps
-
 import logging
 
 ###
 # Globals
 ###
 app = flask.Flask(__name__)
-app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
-api = Api(app)
-CONFIG = config.configuration()
 
 
 ###
 # Pages
 ###
-
-
 @app.route("/")
 @app.route("/index")
 def index():
@@ -46,45 +37,6 @@ def page_not_found(error):
     app.logger.debug("Page not found")
     return flask.render_template('404.html'), 404
 
-
-###
-# APIs
-###
-# class test(Resource):
-#     def get(self):
-#         return "Nice"
-
-# api.add_resource(test, '/test')
-
-def get_API_results(desired_keys, return_type='json'):
-    # Get the times from the db
-    data = acp_db.get_times()
-
-    # Fill the result with only opening and closing times
-    times = {}
-    for entry in data:
-        ind = int(entry['index'])
-        times[ind] = {key: entry[key] for key in desired_keys}
-
-    # Return the json
-    if (return_type == 'json'):
-        return flask.jsonify(times)
-
-class listAll(Resource):
-    def get(self):
-        return get_API_results(['open', 'close'])
-
-class listOpenOnly(Resource):
-    def get(self):
-        return get_API_results(['open'])
-
-class listCloseOnly(Resource):
-    def get(self):
-        return get_API_results(['close'])
-
-api.add_resource(listAll, '/listAll')
-api.add_resource(listOpenOnly, '/listOpenOnly')
-api.add_resource(listCloseOnly, '/listCloseOnly')
 
 ###############
 #
@@ -132,10 +84,9 @@ def _submit_values():
 
 #############
 
-app.debug = CONFIG.DEBUG
 if app.debug:
     app.logger.setLevel(logging.DEBUG)
 
 if __name__ == "__main__":
-    print("Opening for global access on port {}".format(CONFIG.PORT))
-    app.run(port=CONFIG.PORT, host="0.0.0.0")
+    print("Opening for global access on port 5000")
+    app.run(port="5000", host="0.0.0.0")
