@@ -2,10 +2,10 @@ version: '3'
 
 services:
     brevetsapp:
-        build: brevets_app/
+        build: ./brevets_app
         command: python -u flask_brevets.py
         volumes:
-            - /brevets_app:/app
+            - ./brevets_app:/app
         ports:
             - "5000:5000"
         depends_on:
@@ -13,10 +13,10 @@ services:
         environment:
             MONGODB_HOSTNAME: ourdb
     restapi:
-        build: api/
+        build: ./api
         command: python -u api.py
         volumes:
-            - /api:/api
+            - ./api:/api
         ports:
             - "5001:5000"
         depends_on:

@@ -1,10 +1,18 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_restful import Resource, Api
-from brevets.acp_db import get_times
 import logging
+from pymongo import MongoClient
+import os
 
 app = Flask(__name__)
 api = Api(app)
+
+# Stuff for database interaction
+client = MongoClient('mongodb://' + os.environ['MONGODB_HOSTNAME'], 27017)
+db = client.brevetdb
+
+def get_times():
+    return list(db.brevetdb.find())
 
 ###
 # APIs
@@ -17,7 +25,7 @@ api = Api(app)
 
 @api.representation('application/json')
 def return_json(data):
-    return flask.jsonify(data)
+    return jsonify(data)
 
 @api.representation('application/csv')
 def return_csv(data, headers):
@@ -58,8 +66,8 @@ class listCloseOnly(Resource):
 
 # Default list all
 api.add_resource(listAll, '/listAll')
-api.add_resource(listOpenOnly, '/listOpenOnly', '/listOpenOnly/<string:file_type>')
-api.add_resource(listCloseOnly, '/listCloseOnly', '/listCloseOnly/<string:file_type>')
+api.add_resource(listOpenOnly, '/listOpenOnly')
+api.add_resource(listCloseOnly, '/listCloseOnly')
 
 # Specified list all
 # api.add_resource(listAll, '/listAll/<string:file_type>')
