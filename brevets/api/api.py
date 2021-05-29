@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, Response
+from flask import Flask, jsonify, Response, request
 from flask_restful import Resource, Api
 import logging
 from pymongo import MongoClient
@@ -17,16 +17,22 @@ def get_times():
 ###
 # APIs
 ###
-def get_API_results(desired_keys, return_type):
+def get_API_results(desired_keys, return_type, k):
     # Get the times from the db
     data = get_times()
 
     # Fill the result with only desired values
     desired_keys += ['miles', 'km']
     times = {}
-    for entry in data:
-        ind = int(entry['index'])
-        times[ind] = {key: entry[key] for key in desired_keys}
+
+    if k is not None:
+        num_times = min(len(data), int(k))
+    else:
+        num_times = len(data)
+
+    for i in range(num_times):
+        ind = int(data[i]['index'])
+        times[ind] = {key: data[i][key] for key in desired_keys}
 
     app.logger.debug(f"Got a {return_type} request")
 
@@ -46,17 +52,20 @@ def get_API_results(desired_keys, return_type):
 # Returns a list of all open and close times
 class listAll(Resource):
     def get(self, file_type='json'):
-        return get_API_results(['open', 'close'], file_type)
+        k = request.args.get('k')
+        return get_API_results(['open', 'close'], file_type, k)
 
 # Returns a list of all open times
 class listOpenOnly(Resource):
     def get(self, file_type='json'):
-        return get_API_results(['open'], file_type)
+        k = request.args.get('k')
+        return get_API_results(['open'], file_type, k)
 
 # Returns a list of all close times
 class listCloseOnly(Resource):
     def get(self, file_type='json'):
-        return get_API_results(['close'], file_type)
+        k = request.args.get('k')
+        return get_API_results(['close'], file_type, k)
 
 # List of resources
 api.add_resource(listAll, '/listAll', '/listAll/<string:file_type>')
