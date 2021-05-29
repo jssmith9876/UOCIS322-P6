@@ -23,5 +23,14 @@ services:
             - ourdb
         environment:
             MONGODB_HOSTNAME: ourdb
+    website:
+        build: ./website
+        command: python -u website.py
+        volumes:
+            - ./website:/website
+        ports:
+            - "5002:5000"
+        depends_on:
+            - restapi
     ourdb:
         image: mongo:latest
