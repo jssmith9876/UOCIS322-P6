@@ -2,10 +2,10 @@ version: '3'
 
 services:
     brevetsapp:
-        build: brevets/
+        build: brevets_app/
         command: python -u flask_brevets.py
         volumes:
-            - /brevets:/app
+            - /brevets_app:/app
         ports:
             - "5000:5000"
         depends_on:
