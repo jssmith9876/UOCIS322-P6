@@ -13,12 +13,10 @@ def _get_data():
     ret_type = request.args.get('ret_type')
     file_type = request.args.get('file_type')
     k = request.args.get('k')
-    app.logger.debug(ret_type)
-    app.logger.debug(file_type)
-    app.logger.debug(k)
     
-    url = "http://0.0.0.0:5001/" + ret_type + "/" + file_type + "?k=" + k
-    r = requests.get("http://restapi:5001/listAll")
+    # Get the correct api based on the arguments given
+    url = "http://restapi:5000/" + ret_type + "/" + file_type + "?k=" + k
+    r = requests.get(url)
     return r.text
     
 

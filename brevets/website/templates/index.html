@@ -58,31 +58,50 @@
                 <input id="top_results" type="number" value="5">
             </div>
         </div>
+        <div id="results"></div>
 
         <script>
-            function getOptions() {
-                var options = {};
-                options['file_type'] = $("#display_format").val();
-                options['k'] = $("#top_results").val();
-                return options;
-            }
-
             function getData(ret_type) {
                 var file_type = $("#display_format").val();
                 var k = $("#top_results").val();
                 $.get("/_get_data", {ret_type: ret_type, file_type: file_type, k: k}).done(
                     function(data) {
-                        console.log(data);
+                        // Clear the text area
+                        $("#results").text("");
+
+                        // If the file type was json, format accordingly
+                        if (file_type === 'json') {
+                            // Change the data from a string to a dictionary
+                            data = JSON.parse(data);
+
+                            // For each checkpoint in the list
+                            for (var ind in data) {
+                                $("#results").append("<h2>Checkpoint " + ind + "</h2>");
+                                for (var key in data[ind]) {
+                                    $("#results").append("<p>" + key + ": " + data[ind][key] + "</p>");
+                                }
+                            }
+                        }
+                        // Otherwise, the file type is csv
+                        else {
+                            // For each line (broken up by '\n'), add a new line to result field
+                            var line = "";
+                            for (var i = 0; i < data.length; i++) {
+                                line += data[i];
+                                if (data[i] == "\n") {
+                                    $("#results").append("<p>" + line + "</p>");
+                                    line = "";
+                                }
+                            } 
+                        }
                     }
                 );
             }
-
 
             // List all button
             $("#listAll").click(
                 function(event) {
                     event.preventDefault();
-                    console.log("listAll");
                     getData('listAll');
                 }
             );
@@ -91,14 +110,15 @@
             $("#listOpenOnly").click(
                 function(event) {
                     event.preventDefault();
-                    console.log("listOpenOnly");
+                    getData('listOpenOnly');
                 }
             );
 
+            // List close only button
             $("#listCloseOnly").click(
                 function(event) {
                     event.preventDefault();
-                    console.log("listCloseOnly");
+                    getData('listCloseOnly');
                 }
             );
         </script>
